@@ -1,6 +1,7 @@
 name: abeona
 channels:
     - defaults
+    - conda-forge
 dependencies:
     - python=3.12
     - numpy
@@ -8,3 +9,4 @@ dependencies:
     - matplotlib
     - tqdm
     - astropy
+    - jupyterlab
