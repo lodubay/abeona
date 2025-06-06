@@ -13,3 +13,6 @@ src/tex/figures/*
 
 # Miscellaneous
 __pycache__
+
+# Mac nonsense
+**.DS_STORE

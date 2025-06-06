@@ -72,6 +72,27 @@ def decode(df):
         df[col] = str_df[col]
     return df
 
+
+def box_smooth(hist, bins, width):
+    """
+    Box-car smoothing function for a pre-generated histogram.
+
+    Parameters
+    ----------
+    bins : array-like
+        Bins dividing the histogram, including the end. Length must be 1 more
+        than the length of hist, and bins must be evenly spaced.
+    hist : array-like
+        Histogram of data
+    width : float
+        Width of the box-car smoothing function in data units
+    """
+    bin_width = bins[1] - bins[0]
+    box_width = int(width / bin_width)
+    box = np.ones(box_width) / box_width
+    hist_smooth = np.convolve(hist, box, mode='same')
+    return hist_smooth
+
 # =============================================================================
 # PLOTTING FUNCTIONS
 # =============================================================================
