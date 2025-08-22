@@ -168,9 +168,13 @@ class Exponential:
     def scale(self, value):
         if isinstance(value, Number):
             self._scale = float(value)
+        elif isinstance(value, (list, tuple, np.ndarray)):
+            self._scale = value
         else:
-            raise TypeError('Attribute `scale` must be a number. Got: %s.' % 
-                            type(value))
+            raise TypeError(
+                'Attribute `scale` must be a number or array. Got: %s.' % 
+                type(value)
+            )
                         
     @property
     def coeff(self):
@@ -184,9 +188,169 @@ class Exponential:
     def coeff(self, value):
         if isinstance(value, Number):
             self._coeff = float(value)
+        elif isinstance(value, (list, tuple, np.ndarray)):
+            self._coeff = value
         else:
-            raise TypeError('Attribute `coeff` must be a number. Got: %s.' % 
-                            type(value))
+            raise TypeError(
+                'Attribute `coeff` must be a number or array. Got: %s.' % 
+                type(value)
+            )
+        
+
+class LinearExponential(Exponential):
+    """
+    A numpy-friendly linear-exponential function.
+    
+    Parameters
+    ----------
+    scale : float
+        The exponential scale factor.
+    coeff : float
+        The pre-factor for the exponential function.
+
+    Notes
+    -----
+    Inherits attributes and functionality from Exponential.
+    """
+    def __call__(self, x):
+        return x * super().__call__(x)
+
+
+class Gaussian:
+    """
+    A numpy-friendly Gaussian function in some arbitrary x-coordinate.
+
+    Parameters
+    ----------
+    **kwargs : real numbers
+        All attributes can be initialized via keyword arguments. See below.
+
+    Attributes
+    ----------
+    mean : real number
+        The value of the x-coordinate at which the Gaussian is at its peak.
+    amplitude : real number
+        The value of the Gaussian at the peak.
+    width : real number
+        The standard deviation of the Gaussian in the same units as the
+        x-coordinate.
+
+    Calling
+    -------
+    This object can be called with only the value of the x-coordinate in the
+    same units as the attribute ``width``. The return value will have the same
+    units as the attribute ``amplitude``.
+    """
+
+    def __init__(self, mean = 0, amplitude = 1, width = 1):
+        self.mean = mean
+        self.amplitude = amplitude
+        self.width = width
+
+    def __call__(self, x):
+        return self.amplitude * np.exp(-(x - self.mean)**2 / (2 * self.width**2))
+
+    @property
+    def mean(self):
+        r"""
+        Type : real number
+
+        Default : 0
+
+        The value of the x-coordinate in arbitrary units at which the
+        Gaussian has its peak.
+        """
+        return self._mean
+
+    @mean.setter
+    def mean(self, value):
+        if isinstance(value, Number):
+            self._mean = float(value)
+        elif isinstance(value, (list, tuple, np.ndarray)):
+            self._mean = value
+        else:
+            raise TypeError('Mean must be a real number or array. Got: %s' % (
+                type(value)))
+
+    @property
+    def amplitude(self):
+        r"""
+        Type : real number
+
+        Default : 1
+
+        The amplitude of the Gaussian at its peak, in arbitrary units.
+        """
+        return self._amplitude
+
+    @amplitude.setter
+    def amplitude(self, value):
+        if isinstance(value, Number):
+            self._amplitude = float(value)
+        elif isinstance(value, (list, tuple, np.ndarray)):
+            self._amplitude = value
+        else:
+            raise TypeError('Amplitude must be a real number or array. Got: %s' % (
+                type(value)))
+
+    @property
+    def width(self):
+        r"""
+        Type : real number
+
+        Default : 1
+
+        The standard deviation of the Gaussian, in arbitrary units.
+        """
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        if isinstance(value, Number):
+            # if value:
+            self._width = float(value)
+            # else:
+            #     raise ValueError('Width must be nonzero.')
+        elif isinstance(value, (list, tuple, np.ndarray)):
+            # if all([v for v in value]):
+            self._width = value
+            # else:
+            #     raise ValueError('Width must be nonzero.')
+        else:
+            raise TypeError('Width must be a real number or array. Got: %s' % (
+                type(value)))
+
+
+class NormalDistribution(Gaussian):
+    """
+    A numpy-friendly normalized Gaussian function in some arbitrary x-coordinate.
+    
+    Inherits from ``Gaussian``.
+
+    Parameters
+    ----------
+    **kwargs : real numbers
+        All attributes can be initialized via keyword arguments. See below.
+
+    Attributes
+    ----------
+    mean : real number
+        The value of the x-coordinate at which the Gaussian is at its peak.
+    width : real number
+        The standard deviation of the Gaussian in the same units as the
+        x-coordinate.
+
+    Calling
+    -------
+    This object can be called with only the value of the x-coordinate in the
+    same units as the attribute ``width``. The return value will be normalized
+    so that the integral of the function is 1.
+    """
+    
+    def __init__(self, mean = 0, width = 1):
+        amplitude = 1 / (width * np.sqrt(2 * np.pi))
+        super().__init__(mean = mean, amplitude = amplitude, width = width)
+
 
 # =============================================================================
 # DATA UTILITY FUNCTIONS
